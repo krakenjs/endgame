@@ -14,11 +14,13 @@ function failsafe(err) {
 }
 
 
-function unlisten(event, listener) {
-    if (event === UNCAUGHT && listener !== failsafe) {
-        process.removeListener(UNCAUGHT, failsafe);
-        process.removeListener(NEW, unlisten);
-    }
+function unlistener(handler) {
+    return function unlisten(event, listener) {
+        if (event === UNCAUGHT && listener !== handler) {
+            process.removeListener(UNCAUGHT, handler);
+            process.removeListener(NEW, unlisten);
+        }
+    };
 }
 
 
@@ -26,11 +28,16 @@ function unlisten(event, listener) {
  * Configures a default `uncaughtException` handler, but removes itself should
  * a handler be added elsewhere.
  */
-module.exports = function endgame() {
+module.exports = function endgame(handler) {
+    var undo;
+
+    handler = handler || failsafe;
+    undo = unlistener(handler);
+
     if (!EventEmitter.listenerCount(process, UNCAUGHT)) {
-        process.on(UNCAUGHT, failsafe);
-        process.on(NEW, unlisten);
+        process.on(UNCAUGHT, handler);
+        process.on(NEW, undo);
     }
 
-    return unlisten.bind(null, UNCAUGHT, undefined);
+    return undo.bind(null, UNCAUGHT, undefined);
 };

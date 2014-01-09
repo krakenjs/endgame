@@ -57,10 +57,10 @@ test('endgame', function (t) {
     t.test('no handler', function (t) {
         var resetListeners = prepareListeners();
 
-        t.equal(count(), 0);
+        t.equal(count(), 0, 'no handlers registered');
         endgame();
-        t.equal(count(), 1);
-        t.equal(peek().name, 'failsafe');
+        t.equal(count(), 1, 'one handler registered');
+        t.equal(peek().name, 'failsafe', 'handler is endgame handler');
 
         resetListeners();
         t.end();
@@ -68,10 +68,10 @@ test('endgame', function (t) {
 
 
     t.test('existing handler', function (t) {
-        t.equal(count(), 1);
+        t.equal(count(), 1, 'one handler registered');
         endgame();
-        t.equal(count(), 1);
-        t.notEqual(peek().name, 'failsafe');
+        t.equal(count(), 1, 'one handler still registered');
+        t.notEqual(peek().name, 'failsafe', 'handler is not endgame handler');
         t.end();
     });
 
@@ -79,17 +79,17 @@ test('endgame', function (t) {
     t.test('late handler', function (t) {
         var resetListeners = prepareListeners();
 
-        t.equal(count(), 0);
+        t.equal(count(), 0, 'no handlers registered');
         endgame();
-        t.equal(count(), 1);
-        t.equal(peek().name, 'failsafe');
+        t.equal(count(), 1, 'one handler registered');
+        t.equal(peek().name, 'failsafe', 'handler is endgame handler');
 
         process.on(UE, function noop() {
             // foo
         });
 
-        t.equal(count(), 1);
-        t.equal(peek().name, 'noop');
+        t.equal(count(), 1, 'one handler registered');
+        t.equal(peek().name, 'noop', 'handler is alternate handler');
 
         resetListeners();
         t.end();
@@ -111,16 +111,16 @@ test('endgame', function (t) {
             resetListeners();
             resetStderr();
 
-            t.equal(code, 1);
-            t.ok(errmsg.match('uncaughtException'));
-            t.ok(errmsg.match('y u no work?'));
+            t.equal(code, 1, 'correct exit code');
+            t.ok(errmsg.match('uncaughtException'), 'err message is uncaught exception');
+            t.ok(errmsg.match('y u no work?'), 'error is custom error');
             t.end();
         });
 
-        t.equal(count(), 0);
+        t.equal(count(), 0, 'no handlers registered');
         endgame();
-        t.equal(count(), 1);
-        t.equal(peek().name, 'failsafe');
+        t.equal(count(), 1, 'one handler registered');
+        t.equal(peek().name, 'failsafe', 'handler is endgame handler');
 
         setImmediate(function () {
             throw new Error('y u no work?');
@@ -132,17 +132,17 @@ test('endgame', function (t) {
         var resetListeners, undo;
         resetListeners = prepareListeners();
 
-        t.equal(count(), 0);
+        t.equal(count(), 0, 'no handlers registered');
 
         undo = endgame();
 
         t.equal(typeof undo, 'function');
-        t.equal(count(), 1);
-        t.equal(peek().name, 'failsafe');
+        t.equal(count(), 1, 'handler is endgame handler');
+        t.equal(peek().name, 'failsafe', 'handler is endgame handler');
 
         undo();
 
-        t.equal(count(), 0);
+        t.equal(count(), 0, 'no handlers registered');
 
         resetListeners();
         t.end();
@@ -154,16 +154,16 @@ test('endgame', function (t) {
 
         resetListeners = prepareListeners();
 
-        t.equal(count(), 0);
+        t.equal(count(), 0, 'no handlers registered');
         undo = endgame();
 
-        t.equal(count(), 1);
+        t.equal(count(), 1, 'one handler registered');
         process.on('foo', function noop(msg) {
-            t.equal(msg, 'foo');
+            t.equal(msg, 'foo', 'event triggered');
         });
 
         undo();
-        t.equal(count(), 0);
+        t.equal(count(), 0, 'no handlers registered');
 
         process.emit('foo', 'foo');
         resetListeners();
@@ -174,15 +174,15 @@ test('endgame', function (t) {
     t.test('multiple invocations', function (t) {
         var resetListeners = prepareListeners();
 
-        t.equal(count(), 0);
+        t.equal(count(), 0, 'no handlers registered');
 
         endgame();
-        t.equal(count(), 1);
-        t.equal(peek().name, 'failsafe');
+        t.equal(count(), 1, 'one handler registered');
+        t.equal(peek().name, 'failsafe', 'handler is endgame handler');
 
         endgame();
-        t.equal(count(), 1);
-        t.equal(peek().name, 'failsafe');
+        t.equal(count(), 1, 'one handler registered');
+        t.equal(peek().name, 'failsafe', 'handler is endgame handler');
 
         resetListeners();
         t.end();
@@ -194,25 +194,81 @@ test('endgame', function (t) {
 
         resetListeners = prepareListeners();
 
-        t.equal(count(), 0);
+        t.equal(count(), 0, 'no handlers registered');
 
         undo1 = endgame();
-        t.equal(count(), 1);
-        t.equal(peek().name, 'failsafe');
+        t.equal(count(), 1, 'one handler registered');
+        t.equal(peek().name, 'failsafe', 'handler is endgame handler');
 
         undo2 = endgame();
-        t.equal(count(), 1);
-        t.equal(peek().name, 'failsafe');
+        t.equal(count(), 1, 'one handler registered');
+        t.equal(peek().name, 'failsafe', 'handler is endgame handler');
 
         undo2();
-        t.equal(count(), 0);
+        t.equal(count(), 0, 'no handlers registered');
 
         undo1();
-        t.equal(count(), 0);
+        t.equal(count(), 0, 'no handlers registered');
 
         resetListeners();
         t.end();
+    });
 
+
+    t.test('custom handler', function (t) {
+        var resetListeners, undo;
+
+        function custom() {
+            console.log('foo');
+        }
+
+        resetListeners = prepareListeners();
+        t.equal(count(), 0, 'no handlers registered');
+
+        undo = endgame(custom);
+        t.equal(count(), 1, 'one handler registered');
+        t.equal(peek().name, 'custom', 'handler is alternate handler');
+
+        undo();
+        t.equal(count(), 0, 'no handlers registered');
+
+        resetListeners();
+        t.end();
+    });
+
+
+    t.test('multiple custom handler (only first one is used)', function (t) {
+        var resetListeners, undo1, undo2;
+
+        function custom1() {
+            console.log('foo');
+        }
+
+        function custom2() {
+            console.log('bar');
+        }
+
+        resetListeners = prepareListeners();
+        t.equal(count(), 0, 'no handlers registered');
+
+        undo1 = endgame(custom1);
+        t.equal(count(), 1, 'one handler registered');
+        t.equal(peek().name, 'custom1', 'registered handler is initial handler');
+
+        // noop
+        undo2 = endgame(custom2);
+        t.equal(count(), 1, 'one handler registered');
+        t.equal(peek().name, 'custom1', 'registered handler is initial handler');
+
+        // noop
+        undo2();
+        t.equal(count(), 1, 'one handler registered');
+
+        undo1();
+        t.equal(count(), 0, 'no handlers registered');
+
+        resetListeners();
+        t.end();
     });
 
 });
