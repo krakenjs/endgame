@@ -28,4 +28,6 @@ module.exports = function endgame(config) {
         process.on('uncaughtException', failsafe);
         process.on('newListener', unlisten);
     }
+
+    return unlisten.bind(null, 'uncaughtException', undefined);
 };
