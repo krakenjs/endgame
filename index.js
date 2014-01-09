@@ -3,18 +3,21 @@
 var EventEmitter = require('events').EventEmitter;
 
 
+var UNCAUGHT = 'uncaughtException', // sooo lazy
+    NEW = 'newListener';
+
 
 function failsafe(err) {
-    console.error(new Date().toUTCString(), 'uncaughtException', err.message);
+    console.error(new Date().toUTCString(), UNCAUGHT, err.message);
     console.error(err.stack);
     process.exit(1);
 }
 
 
 function unlisten(event, listener) {
-    if (event === 'uncaughtException' && listener !== failsafe) {
-        process.removeListener('uncaughtException', failsafe);
-        process.removeListener('newListener', unlisten);
+    if (event === UNCAUGHT && listener !== failsafe) {
+        process.removeListener(UNCAUGHT, failsafe);
+        process.removeListener(NEW, unlisten);
     }
 }
 
@@ -24,10 +27,10 @@ function unlisten(event, listener) {
  * a handler be added elsewhere.
  */
 module.exports = function endgame() {
-    if (!EventEmitter.listenerCount(process, 'uncaughtException')) {
-        process.on('uncaughtException', failsafe);
-        process.on('newListener', unlisten);
+    if (!EventEmitter.listenerCount(process, UNCAUGHT)) {
+        process.on(UNCAUGHT, failsafe);
+        process.on(NEW, unlisten);
     }
 
-    return unlisten.bind(null, 'uncaughtException', undefined);
+    return unlisten.bind(null, UNCAUGHT, undefined);
 };

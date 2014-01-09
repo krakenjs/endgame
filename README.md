@@ -6,7 +6,6 @@ Simply `require` and invoke.
 
 ```javascript
 // failed.js
-
 var endgame = require('endgame');
 
 endgame();
@@ -27,12 +26,10 @@ registered handler.
 `endgame` also returns a function that can be invoked to undo `endgame`'s behavior.
 ```javascript
 // undo.js
-
 var endgame = require('endgame'),
     undo = endgame();
 
 // do stuff and decide to revert `endgame` changes
 
 undo();
-
 ```

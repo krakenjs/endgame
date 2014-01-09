@@ -170,4 +170,49 @@ test('endgame', function (t) {
         t.end();
     });
 
+
+    t.test('multiple invocations', function (t) {
+        var resetListeners = prepareListeners();
+
+        t.equal(count(), 0);
+
+        endgame();
+        t.equal(count(), 1);
+        t.equal(peek().name, 'failsafe');
+
+        endgame();
+        t.equal(count(), 1);
+        t.equal(peek().name, 'failsafe');
+
+        resetListeners();
+        t.end();
+    });
+
+
+    t.test('multiple undo', function (t) {
+        var resetListeners, undo1, undo2;
+
+        resetListeners = prepareListeners();
+
+        t.equal(count(), 0);
+
+        undo1 = endgame();
+        t.equal(count(), 1);
+        t.equal(peek().name, 'failsafe');
+
+        undo2 = endgame();
+        t.equal(count(), 1);
+        t.equal(peek().name, 'failsafe');
+
+        undo2();
+        t.equal(count(), 0);
+
+        undo1();
+        t.equal(count(), 0);
+
+        resetListeners();
+        t.end();
+
+    });
+
 });
