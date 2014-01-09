@@ -23,7 +23,7 @@ function unlisten(event, listener) {
  * Configures a default `uncaughtException` handler, but removes itself should
  * a handler be added elsewhere.
  */
-module.exports = function lastresort(config) {
+module.exports = function endgame(config) {
     if (!EventEmitter.listenerCount(process, 'uncaughtException')) {
         process.on('uncaughtException', failsafe);
         process.on('newListener', unlisten);
