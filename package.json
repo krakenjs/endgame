@@ -1,0 +1,34 @@
+{
+  "name": "endgame",
+  "version": "0.0.0",
+  "description": "A tiny module for ensuring uncaught exceptions are handled in Node.js",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "tape test/*.js",
+    "cover": "istanbul cover tape -- test/*.js",
+    "lint": "jshint -c .jshintrc index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/totherik/endgame.git"
+  },
+  "keywords": [
+    "node",
+    "uncaught",
+    "exception"
+  ],
+  "author": "Erik Toth <totherik@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/totherik/endgame/issues"
+  },
+  "homepage": "https://github.com/totherik/endgame",
+  "devDependencies": {
+    "tape": "~2.3.2",
+    "istanbul": "~0.2.3",
+    "jshint": "~2.4.1"
+  }
+}
