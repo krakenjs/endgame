@@ -22,3 +22,17 @@ throw new Error('y u no work?');
 If an `uncaughtException` handler has already been registered, `endgame` becomes a noop. If an `uncaughtException` handler
 is registered *after* `endgame` has been invoked, `endgame`'s default handler is automatically removed in favor of the newly
 registered handler.
+
+
+`endgame` also returns a function that can be invoked to undo `endgame`'s behavior.
+```javascript
+// undo.js
+
+var endgame = require('endgame'),
+    undo = endgame();
+
+// do stuff and decide to revert `endgame` changes
+
+undo();
+
+```
