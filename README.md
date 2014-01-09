@@ -20,5 +20,5 @@ throw new Error('y u no work?');
 ```
 
 If an `uncaughtException` handler has already been registered, `endgame` becomes a noop. If an `uncaughtException` handler
-is registered *after* `endgame` has been invoked, `endgame`'s default handle is automatically removed in favor of the newly
+is registered *after* `endgame` has been invoked, `endgame`'s default handler is automatically removed in favor of the newly
 registered handler.
