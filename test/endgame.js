@@ -112,6 +112,7 @@ test('endgame', function (t) {
             resetStderr();
 
             t.equal(code, 1);
+            console.log(errmsg);
             t.ok(errmsg.match('uncaughtException'));
             t.ok(errmsg.match('y u no work?'));
             t.end();
