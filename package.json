@@ -1,6 +1,6 @@
 {
   "name": "endgame",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A tiny module for ensuring uncaught exceptions are handled in Node.js",
   "main": "index.js",
   "directories": {
