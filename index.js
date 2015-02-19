@@ -9,7 +9,11 @@ var UNCAUGHT = 'uncaughtException', // sooo lazy
 
 function failsafe(err) {
     console.error(new Date().toUTCString(), UNCAUGHT, err.message);
-    console.error(err.stack);
+    if (err && err.stack) {
+        console.error(err.stack);
+    } else if (err) {
+        console.error(err);
+    }
     process.exit(1);
 }
 
