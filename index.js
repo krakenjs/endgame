@@ -29,12 +29,17 @@ function unlistener(handler) {
  * a handler be added elsewhere.
  */
 module.exports = function endgame(handler) {
-    var undo;
+    var undo,
+        numberOfListeners;
 
     handler = handler || failsafe;
     undo = unlistener(handler);
 
-    if (!process.listenerCount(UNCAUGHT)) {
+    numberOfListeners = Object.prototype.hasOwnProperty.call(EventEmitter, 'listenerCount')
+        ? EventEmitter.listenerCount(process, UNCAUGHT)
+        : process.listenerCount(UNCAUGHT);
+
+    if (!numberOfListeners) {
         process.on(UNCAUGHT, handler);
         process.on(NEW, undo);
     }
