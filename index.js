@@ -34,7 +34,7 @@ module.exports = function endgame(handler) {
     handler = handler || failsafe;
     undo = unlistener(handler);
 
-    if (!EventEmitter.listenerCount(process, UNCAUGHT)) {
+    if (!process.listenerCount(UNCAUGHT)) {
         process.on(UNCAUGHT, handler);
         process.on(NEW, undo);
     }
